@@ -16,7 +16,11 @@ Antes de ejecutar el sistema por primera vez, asegúrate de cumplir con los sigu
 ### 1. Entorno de Python (Librerías)
 Las dependencias necesarias para la interfaz web (Flask) y el manejo de datos (Pandas/Openpyxl) deben instalarse mediante la terminal. Conéctate a la raíz del proyecto y ejecuta:
 
+
+
+ HAADOP/BIN/ WINUTILS/HAADOP
+ 
+
 ```bash
 pip install flask pyspark pandas openpyxl
-
 
