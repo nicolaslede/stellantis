@@ -1,201 +1,1022 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Control de Operaciones - Stellantis Spark Engine</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body { background-color: #f1f3f5; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        .main-card { border-radius: 16px; box-shadow: 0 6px 18px rgba(0,0,0,0.06); background: white; padding: 35px; margin-top: 40px; margin-bottom: 40px; }
-        .upload-zone { border: 2px dashed #0d6efd; border-radius: 12px; background-color: #f0f7ff; padding: 30px; text-align: center; transition: all 0.3s ease; }
-        .upload-zone:hover { background-color: #e2f0ff; border-color: #0a58ca; }
-        .loading-overlay { display: none; margin-top: 20px; text-align: center; }
-        
-        /* Dashboard KPI Cards */
-        .kpi-card { border-radius: 12px; padding: 25px; color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
-        .kpi-ready { background: linear-gradient(135deg, #11998e, #38ef7d); }
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Stellantis — Logística de Planta</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg:      #f4f5f8;
+  --surface: #ffffff;
+  --border:  #e4e7ef;
+  --border2: #d0d5e8;
+  --text:    #111827;
+  --sub:     #374151;
+  --muted:   #6b7280;
+  --faint:   #9ca3af;
 
-        /* Contenedores con Score Inteligente */
-        details.contenedor-item {
-            background: #fff;
-            border: 1px solid #e0e0e0;
-            margin-bottom: 15px;
-            border-radius: 10px;
-            padding: 18px;
-            box-shadow: 0 3px 6px rgba(0,0,0,0.02);
-            transition: border-color 0.2s, transform 0.2s;
-        }
-        details.contenedor-item:hover {
-            border-color: #0d6efd;
-            transform: translateY(-2px);
-        }
-        details.contenedor-item summary {
-            font-weight: 600;
-            cursor: pointer;
-            outline: none;
-            list-style: none;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        details.contenedor-item summary::-webkit-details-marker { display: none; }
-        
-        /* Barras de Score visuales */
-        .score-bar-container { width: 120px; background-color: #e9ecef; border-radius: 10px; height: 8px; display: inline-block; overflow: hidden; vertical-align: middle; }
-        .score-bar-fill { height: 100%; border-radius: 10px; }
-        
-        .tabla-piezas { width: 100%; margin-top: 15px; border-radius: 8px; overflow: hidden; border: 1px solid #eeeeee; }
-        .tabla-piezas th { background: #f8f9fa; padding: 12px; border-bottom: 2px solid #dee2e6; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px; }
-        .tabla-piezas td { padding: 12px; border-bottom: 1px solid #f1f1f1; }
-    </style>
+  --blue:    #2563eb;
+  --blue-lt: #eff4ff;
+  --blue-bd: #c7d9ff;
+
+  --red:     #dc2626;
+  --red-lt:  #fff1f1;
+  --red-bd:  #fecaca;
+
+  --amber:   #d97706;
+  --amb-lt:  #fffbeb;
+  --amb-bd:  #fde68a;
+
+  --green:   #16a34a;
+  --grn-lt:  #f0fdf4;
+  --grn-bd:  #bbf7d0;
+
+  --radius:  6px;
+  --font:    'Inter', sans-serif;
+  --mono:    'JetBrains Mono', monospace;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body { background: var(--bg); color: var(--text); font-family: var(--font); font-size: 14px; line-height: 1.5; overflow: hidden; }
+button { cursor: pointer; border: none; background: none; font-family: inherit; font-size: 14px; }
+input { font-family: inherit; font-size: 14px; }
+
+/* ── screens ── */
+.screen { display: none; width: 100vw; height: 100vh; }
+.screen.active { display: flex; }
+
+/* ══════════════════════════════════
+   LOGIN  — card centrada, minimalista
+══════════════════════════════════ */
+#login-screen {
+  background: var(--bg);
+  align-items: center;
+  justify-content: center;
+}
+.login-card {
+  width: 380px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 40px 36px 32px;
+  box-shadow: 0 2px 16px rgba(0,0,0,.07);
+}
+.login-logo {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 28px;
+}
+.login-logo-sq {
+  width: 36px; height: 36px;
+  background: var(--blue);
+  border-radius: 5px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; font-weight: 800; color: #fff;
+}
+.login-logo-name { font-size: 17px; font-weight: 700; color: var(--text); }
+.login-logo-sub  { font-size: 11px; color: var(--muted); }
+
+.login-heading { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+.login-desc    { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
+
+.field-label {
+  display: block; font-size: 12px; font-weight: 600;
+  color: var(--sub); margin-bottom: 5px;
+}
+.field-input {
+  width: 100%;
+  border: 1px solid var(--border2);
+  border-radius: var(--radius);
+  padding: 9px 12px;
+  color: var(--text);
+  background: var(--bg);
+  outline: none;
+  transition: border .15s, box-shadow .15s;
+  margin-bottom: 16px;
+}
+.field-input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(37,99,235,.1); }
+
+.role-label-sm { font-size: 12px; font-weight: 600; color: var(--sub); margin-bottom: 8px; }
+.role-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 22px; }
+.role-opt {
+  border: 1.5px solid var(--border2);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex; align-items: center; gap: 9px;
+  cursor: pointer; transition: border .15s, background .15s;
+  background: var(--bg);
+}
+.role-opt.active { border-color: var(--blue); background: var(--blue-lt); }
+.role-opt-icon { font-size: 18px; flex-shrink: 0; }
+.role-opt-name { font-size: 14px; font-weight: 600; color: var(--text); }
+.role-opt-desc { font-size: 11px; color: var(--muted); }
+
+.login-btn {
+  width: 100%;
+  background: var(--blue); color: #fff;
+  border-radius: var(--radius);
+  padding: 10px;
+  font-size: 14px; font-weight: 600;
+  transition: background .15s;
+}
+.login-btn:hover { background: #1d4fd8; }
+.login-footer { text-align: center; margin-top: 16px; font-size: 11px; color: var(--faint); font-family: var(--mono); }
+
+/* ══════════════════════════════════
+   APP SHELL
+══════════════════════════════════ */
+#app-screen { flex-direction: row; }
+
+/* sidebar */
+.sidebar {
+  width: 220px; min-width: 220px;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+}
+.sb-logo {
+  padding: 18px 18px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 9px;
+}
+.sb-logo-sq {
+  width: 30px; height: 30px; background: var(--blue); border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 800; color: #fff; flex-shrink: 0;
+}
+.sb-logo-name { font-size: 15px; font-weight: 700; }
+.sb-logo-sub  { font-size: 10px; color: var(--muted); }
+
+.sb-section { padding: 16px 10px 6px; }
+.sb-section-label { font-size: 10px; font-weight: 600; color: var(--faint); text-transform: uppercase; letter-spacing: .08em; padding: 0 8px; margin-bottom: 4px; }
+.nav-item {
+  display: flex; align-items: center; gap: 9px;
+  padding: 8px 10px; border-radius: 5px;
+  font-size: 13px; font-weight: 500; color: var(--muted);
+  cursor: pointer; transition: all .1s; margin-bottom: 1px;
+}
+.nav-item:hover { background: var(--bg); color: var(--text); }
+.nav-item.active { background: var(--blue-lt); color: var(--blue); font-weight: 600; }
+.nav-icon { width: 16px; text-align: center; font-size: 13px; flex-shrink: 0; }
+.nav-badge { margin-left: auto; background: var(--red); color: #fff; font-size: 10px; font-weight: 700; border-radius: 99px; padding: 1px 6px; font-family: var(--mono); }
+
+.sb-bottom { margin-top: auto; border-top: 1px solid var(--border); padding: 14px 10px; }
+.user-row {
+  display: flex; align-items: center; gap: 9px;
+  padding: 8px 10px; border-radius: 5px;
+  background: var(--bg); margin-bottom: 4px;
+}
+.user-av {
+  width: 30px; height: 30px; border-radius: 50%; background: var(--blue);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; color: #fff; flex-shrink: 0;
+}
+.user-name { font-size: 13px; font-weight: 600; }
+.user-role { font-size: 10px; color: var(--muted); }
+.logout-btn { display: flex; align-items: center; gap: 7px; padding: 7px 10px; font-size: 12px; color: var(--muted); border-radius: 5px; transition: color .1s; width: 100%; cursor: pointer; }
+.logout-btn:hover { color: var(--red); }
+
+/* main */
+.main { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
+.topbar {
+  height: 54px; min-height: 54px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; padding: 0 24px; gap: 12px;
+}
+.topbar-title { font-size: 16px; font-weight: 700; flex: 1; }
+.topbar-tag { font-size: 10px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; border: 1px solid var(--border2); border-radius: 4px; padding: 3px 8px; color: var(--faint); font-family: var(--mono); }
+.topbar-time { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+.content { flex: 1; overflow-y: auto; padding: 24px; }
+.content::-webkit-scrollbar { width: 4px; }
+.content::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+
+/* page */
+.page { display: none; }
+.page.active { display: block; }
+
+/* ── section header ── */
+.sec-hdr { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.sec-title { font-size: 15px; font-weight: 700; }
+.sec-count { font-size: 11px; font-family: var(--mono); color: var(--muted); background: var(--bg); border: 1px solid var(--border); border-radius: 99px; padding: 2px 9px; }
+.sec-actions { margin-left: auto; display: flex; gap: 6px; }
+
+/* ── kpi grid ── */
+.kpi-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 22px; }
+.kpi {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  position: relative;
+}
+.kpi-icon-bg { position: absolute; right: 16px; top: 16px; font-size: 24px; opacity: .12; }
+.kpi-label { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; margin-bottom: 8px; }
+.kpi-val   { font-size: 32px; font-weight: 800; line-height: 1; font-family: var(--mono); margin-bottom: 4px; }
+.kpi-sub   { font-size: 11px; color: var(--muted); }
+.kpi.red   { border-left: 3px solid var(--red); }
+.kpi.amber { border-left: 3px solid var(--amber); }
+.kpi.green { border-left: 3px solid var(--green); }
+.kpi.blue  { border-left: 3px solid var(--blue); }
+.c-red   { color: var(--red); }
+.c-amber { color: var(--amber); }
+.c-green { color: var(--green); }
+.c-blue  { color: var(--blue); }
+
+/* ── semaphore ── */
+.sem-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 22px; }
+.sem-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  display: flex; align-items: center; gap: 12px;
+}
+.sem-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.sem-dot.red   { background: var(--red);   box-shadow: 0 0 0 3px var(--red-lt); animation: blink 2s infinite; }
+.sem-dot.amber { background: var(--amber); box-shadow: 0 0 0 3px var(--amb-lt); }
+.sem-dot.green { background: var(--green); box-shadow: 0 0 0 3px var(--grn-lt); }
+.sem-body { flex: 1; min-width: 0; }
+.sem-name  { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sem-piece { font-size: 11px; color: var(--muted); margin-bottom: 5px; }
+.sem-track { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
+.sem-fill  { height: 100%; border-radius: 2px; }
+.sem-fill.red   { background: var(--red); }
+.sem-fill.amber { background: var(--amber); }
+.sem-fill.green { background: var(--green); }
+.sem-num { font-size: 20px; font-weight: 800; font-family: var(--mono); flex-shrink: 0; }
+.sem-num.red   { color: var(--red); }
+.sem-num.amber { color: var(--amber); }
+.sem-num.green { color: var(--green); }
+
+/* ── table ── */
+.tbl-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 22px; }
+table { width: 100%; border-collapse: collapse; }
+thead th { background: var(--bg); padding: 10px 16px; font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; text-align: left; border-bottom: 1px solid var(--border); }
+tbody tr { border-bottom: 1px solid var(--border); }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: var(--bg); }
+tbody td { padding: 11px 16px; font-size: 13px; color: var(--sub); }
+td.mono { font-family: var(--mono); font-size: 12px; }
+
+/* ── badge ── */
+.badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; font-family: var(--mono); letter-spacing: .04em; }
+.badge.red   { background: var(--red-lt);  color: var(--red);   border: 1px solid var(--red-bd); }
+.badge.amber { background: var(--amb-lt);  color: var(--amber); border: 1px solid var(--amb-bd); }
+.badge.green { background: var(--grn-lt);  color: var(--green); border: 1px solid var(--grn-bd); }
+.badge.blue  { background: var(--blue-lt); color: var(--blue);  border: 1px solid var(--blue-bd); }
+.badge.grey  { background: var(--bg);      color: var(--muted); border: 1px solid var(--border); }
+
+/* ── prio ── */
+.prio { width: 24px; height: 24px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; font-family: var(--mono); }
+.prio.p1 { background: var(--red-lt);  color: var(--red); }
+.prio.p2 { background: var(--amb-lt);  color: var(--amber); }
+.prio.p3 { background: var(--grn-lt);  color: var(--green); }
+
+/* ── buttons ── */
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: var(--radius); font-size: 13px; font-weight: 600; transition: all .12s; cursor: pointer; }
+.btn-primary { background: var(--blue); color: #fff; }
+.btn-primary:hover { background: #1d4fd8; }
+.btn-ghost { background: var(--surface); color: var(--sub); border: 1px solid var(--border2); }
+.btn-ghost:hover { border-color: var(--blue); color: var(--blue); }
+.btn-sm { padding: 5px 11px; font-size: 12px; }
+
+/* ══════════════════════════════════
+   DASHBOARD layout
+══════════════════════════════════ */
+.dash-cols { display: grid; grid-template-columns: 2fr 1fr; gap: 14px; }
+
+/* ══════════════════════════════════
+   IMPORTACIÓN — minimal dual
+══════════════════════════════════ */
+.import-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 22px; }
+.imp-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.imp-head { padding: 14px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 9px; }
+.imp-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.imp-dot.blue  { background: var(--blue); }
+.imp-dot.amber { background: var(--amber); }
+.imp-head-title { font-size: 13px; font-weight: 700; }
+.imp-head-tag   { margin-left: auto; font-size: 10px; color: var(--muted); font-family: var(--mono); background: var(--bg); border: 1px solid var(--border); border-radius: 4px; padding: 2px 7px; }
+.imp-body { padding: 18px; }
+
+.drop-zone {
+  border: 1.5px dashed var(--border2);
+  border-radius: var(--radius);
+  padding: 28px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: border .15s, background .15s;
+  margin-bottom: 12px;
+}
+.drop-zone:hover, .drop-zone.over { border-color: var(--blue); background: var(--blue-lt); }
+.drop-icon  { font-size: 28px; opacity: .4; margin-bottom: 8px; }
+.drop-title { font-size: 13px; font-weight: 600; margin-bottom: 3px; }
+.drop-sub   { font-size: 11px; color: var(--muted); margin-bottom: 12px; }
+.file-pill  { display: none; font-family: var(--mono); font-size: 11px; color: var(--blue); background: var(--blue-lt); border: 1px solid var(--blue-bd); border-radius: 4px; padding: 5px 10px; text-align: left; margin-bottom: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.imp-actions { display: flex; gap: 6px; margin-bottom: 12px; }
+
+.prog-label { font-size: 11px; color: var(--muted); margin-bottom: 5px; }
+.prog-track { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+.prog-fill  { height: 100%; border-radius: 2px; width: 0; transition: width .3s; }
+.prog-fill.blue  { background: var(--blue); }
+.prog-fill.amber { background: var(--amber); }
+
+.imp-log {
+  margin-top: 10px;
+  background: var(--bg); border: 1px solid var(--border); border-radius: 4px;
+  padding: 10px 12px; font-family: var(--mono); font-size: 11px; color: var(--muted);
+  height: 96px; overflow-y: auto;
+}
+.log-line { margin-bottom: 2px; }
+.log-line.ok   { color: var(--green); }
+.log-line.err  { color: var(--red); }
+.log-line.info { color: var(--blue); }
+
+/* ══════════════════════════════════
+   ALERTAS — minimal
+══════════════════════════════════ */
+.alert-list { display: flex; flex-direction: column; gap: 8px; }
+.alert-row {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 14px 18px; display: flex; align-items: center; gap: 14px;
+}
+.alert-row.crit { border-left: 3px solid var(--red); }
+.alert-row.warn { border-left: 3px solid var(--amber); }
+.alert-row.info { border-left: 3px solid var(--blue); }
+.alert-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.alert-dot.red   { background: var(--red); }
+.alert-dot.amber { background: var(--amber); }
+.alert-body { flex: 1; }
+.alert-title { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+.alert-desc  { font-size: 12px; color: var(--muted); }
+.alert-time  { font-size: 11px; font-family: var(--mono); color: var(--faint); flex-shrink: 0; }
+.ack-btn { font-size: 11px; font-weight: 600; padding: 5px 10px; border-radius: 4px; border: 1px solid var(--border2); color: var(--muted); transition: all .12s; cursor: pointer; white-space: nowrap; }
+.ack-btn:hover { border-color: var(--green); color: var(--green); }
+
+/* ══════════════════════════════════
+   ROLES — minimal
+══════════════════════════════════ */
+.roles-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 22px; }
+.role-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.role-card-head { padding: 14px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+.role-av { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: #fff; flex-shrink: 0; }
+.role-av.s { background: var(--blue); }
+.role-av.o { background: #7c3aed; }
+.role-card-name { font-size: 14px; font-weight: 700; }
+.role-card-sub  { font-size: 11px; color: var(--muted); }
+.perm-list { padding: 4px 18px 14px; }
+.perm-row { display: flex; align-items: center; gap: 9px; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; color: var(--sub); }
+.perm-row:last-child { border-bottom: none; }
+.perm-icon.on  { color: var(--green); }
+.perm-icon.off { color: var(--red); opacity: .5; }
+
+/* ── toast ── */
+.toast-area { position: fixed; bottom: 20px; right: 20px; z-index: 999; display: flex; flex-direction: column; gap: 6px; }
+.toast { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 16px; font-size: 13px; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 16px rgba(0,0,0,.1); animation: tin .18s ease; max-width: 300px; }
+.toast.ok   { border-left: 3px solid var(--green); }
+.toast.err  { border-left: 3px solid var(--red); }
+.toast.info { border-left: 3px solid var(--blue); }
+
+@keyframes tin  { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
+@keyframes blink { 0%,100%{opacity:1;} 50%{opacity:.4;} }
+* { scrollbar-width: thin; scrollbar-color: var(--border2) transparent; }
+</style>
 </head>
 <body>
 
-<div class="container-fluid px-4 px-md-5">
-    <div class="main-card">
-        <div class="d-flex justify-content-between align-items-center border-bottom pb-4 mb-4">
-            <div>
-                <h2 class="fw-bold text-dark m-0">📊 Sistema de Optimización de Apertura — Stellantis</h2>
-                <p class="text-muted m-0 mt-1">Procesamiento masivo con Spark Engine para la priorización y despacho en tiempo real de componentes.</p>
-            </div>
-            <span class="fs-1">🏭</span>
-        </div>
-        
-        <form id="uploadForm" action="/upload" method="POST" enctype="multipart/form-data" onsubmit="mostrarCarga()">
-            <div class="row align-items-center mb-4">
-                <div class="col-md-9 mb-3 mb-md-0">
-                    <div class="upload-zone">
-                        <input type="file" class="form-control" id="fileInput" name="file" accept=".csv, .xlsx, .xls" required>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <button type="submit" class="btn btn-primary btn-lg w-100 py-3 shadow" id="btnProcesar">
-                        🚀 Iniciar Spark Engine
-                    </button>
-                </div>
-            </div>
-        </form>
-
-        <div class="loading-overlay my-4" id="loadingZone">
-            <div class="spinner-border text-primary mb-2" role="status" style="width: 3rem; height: 3rem;"></div>
-            <p class="fw-bold text-primary fs-5">⚡ Spark Engine distribuyendo nodos y aplicando reglas logísticas... Por favor espere.</p>
-        </div>
-
-        {% if success %}
-        <div id="resultMessage" class="animate__animated animate__fadeIn">
-            
-            <div class="row justify-content-center mb-5">
-                <div class="col-md-6">
-                    <div class="kpi-card kpi-ready text-center">
-                        <small class="text-uppercase fw-bold opacity-75 letter-spacing-1">Contenedores Listos para Apertura Inmediata</small>
-                        <h1 class="display-3 fw-bold m-0 mt-2" id="kpi-total-val">{{ total_patio }}</h1>
-                        <p class="m-0 mt-2">📦 Unidades en patio con validación administrativa completa (3 SI).</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-light p-4 rounded-4 mb-4 border">
-                <h4 class="fw-bold text-dark mb-2">🔎 Smart Search & Algoritmo de Apertura Óptimo</h4>
-                <p class="text-muted small">Escribí el número de pieza que la línea de montaje está reclamando. El sistema reordenará y te abrirá automáticamente el contenedor exacto con el mayor índice de conveniencia operativa.</p>
-                <input type="text" id="buscador" class="form-control form-control-lg border-primary shadow-sm" placeholder="Ingrese Número de Contenedor, Código de Plano o Descripción de la Pieza..." onkeyup="filtrarContenedores()">
-            </div>
-
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="fw-bold text-secondary m-0">📋 Jerarquía de Despacho Recomendada (Filtro de Patio Activo)</h5>
-                <span class="badge bg-dark px-3 py-2">Tiempo de Ejecución Spark: {{ time }}s</span>
-            </div>
-            
-            <div id="lista-contenedores">
-                {% for nro_cont, datos in contenedores.items() %}
-                <details class="contenedor-item" data-enplanta="{{ datos.en_planta }}" data-disponible="{{ datos.disponible }}">
-                    <summary>
-                        <div class="d-flex align-items-center gap-3">
-                            <span class="fs-4">🚢</span>
-                            <div>
-                                <span class="text-dark fw-bold fs-5">{{ nro_cont }}</span>
-                                <div class="d-block small text-muted">
-                                    Índice de Apertura: 
-                                    <div class="score-bar-container mx-1">
-                                        {% if datos.score >= 80 %}
-                                            <div class="score-bar-fill bg-success" style="width: {{ datos.score }}%;"></div>
-                                        {% elif datos.score >= 50 %}
-                                            <div class="score-bar-fill bg-warning" style="width: {{ datos.score }}%;"></div>
-                                        {% else %}
-                                            <div class="score-bar-fill bg-danger" style="width: 15%;"></div>
-                                        {% endif %}
-                                    </div>
-                                    <span class="fw-bold text-dark">{{ datos.score }} pts</span>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="d-flex gap-2">
-                            <span class="badge bg-success px-3 py-2 rounded-pill">EN PATIO</span>
-                            <span class="badge bg-info text-dark px-3 py-2 rounded-pill">OPERATIVO 3 SI</span>
-                        </div>
-                    </summary>
-                    
-                    <div class="mt-3 border-top pt-3">
-                        <p class="small fw-bold text-uppercase text-secondary mb-2">📋 Manifiesto de Carga Interna:</p>
-                        <table class="tabla-piezas shadow-sm">
-                            <thead>
-                                <tr>
-                                    <th>Plano de Ingeniería</th>
-                                    <th>Descripción Técnica del Componente</th>
-                                    <th style="text-align: right;">Cantidad Unidades</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for p in datos.piezas %}
-                                <tr>
-                                    <td class="fw-bold text-primary font-monospace">{{ p.plano }}</td>
-                                    <td class="text-muted small">{{ p.descripcion }}</td>
-                                    <td class="fw-bold text-dark fs-5" style="text-align: right; font-family: monospace;">{{ p.cantidad }}</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </details>
-                {% endfor %}
-            </div>
-        </div>
-        {% endif %}
-
+<!-- ════════ LOGIN ════════ -->
+<div id="login-screen" class="screen active">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="login-logo-sq">S</div>
+      <div>
+        <div class="login-logo-name">Stellantis</div>
+        <div class="login-logo-sub">Logística de Planta</div>
+      </div>
     </div>
+
+    <div class="login-heading">Iniciar sesión</div>
+    <div class="login-desc">Ingresá tus credenciales para acceder al sistema.</div>
+
+    <label class="field-label">Usuario</label>
+    <input class="field-input" type="text" id="login-user" placeholder="usuario.apellido"/>
+
+    <label class="field-label">Contraseña</label>
+    <input class="field-input" type="password" id="login-pass" placeholder="••••••••"
+           onkeydown="if(event.key==='Enter')doLogin()"/>
+
+    <div class="role-label-sm">Perfil</div>
+    <div class="role-row">
+      <div class="role-opt active" onclick="pickRole('supervisor',this)">
+        <span class="role-opt-icon">🧑‍💼</span>
+        <div>
+          <div class="role-opt-name">Supervisor</div>
+          <div class="role-opt-desc">Acceso completo</div>
+        </div>
+      </div>
+      <div class="role-opt" onclick="pickRole('operario',this)">
+        <span class="role-opt-icon">🏭</span>
+        <div>
+          <div class="role-opt-name">Operario</div>
+          <div class="role-opt-desc">Ejecuta apertura</div>
+        </div>
+      </div>
+    </div>
+
+    <button class="login-btn" onclick="doLogin()">Ingresar</button>
+    <div class="login-footer">v1.0 · Sprint 1 · Prototipo UX/UI · Equipo 7</div>
+  </div>
 </div>
 
-<script>
-    function mostrarCarga() {
-        document.getElementById('btnProcesar').disabled = true;
-        document.getElementById('loadingZone').style.display = 'block';
-        let msgAnterior = document.getElementById('resultMessage');
-        if (msgAnterior) { msgAnterior.style.display = 'none'; }
-    }
+<!-- ════════ APP ════════ -->
+<div id="app-screen" class="screen">
+  <nav class="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-sq">S</div>
+      <div>
+        <div class="sb-logo-name">Stellantis</div>
+        <div class="sb-logo-sub">Logística</div>
+      </div>
+    </div>
 
-    // Algoritmo Smart Search: Filtra y autodespliega para facilitar la toma de decisiones inmediata
-    function filtrarContenedores() {
-        let input = document.getElementById('buscador').value.toLowerCase();
-        let detalles = document.getElementsByClassName('contenedor-item');
-        
-        for (let i = 0; i < detalles.length; i++) {
-            let texto = detalles[i].innerText.toLowerCase();
-            
-            if (texto.includes(input)) {
-                detalles[i].style.display = "block";
-                
-                // Si está buscando un plano/contenedor específico, abre el panel solo para mostrar la info interna al instante
-                if(input.length > 2) {
-                    detalles[i].setAttribute("open", "true");
-                } else {
-                    detalles[i].removeAttribute("open");
-                }
-            } else {
-                detalles[i].style.display = "none";
-            }
-        }
+    <div class="sb-section">
+      <div class="sb-section-label">Principal</div>
+      <div class="nav-item active" onclick="goPage('dashboard',this)"><span class="nav-icon">▦</span> Dashboard</div>
+      <div class="nav-item" onclick="goPage('apertura',this)"><span class="nav-icon">📦</span> Plan de Apertura</div>
+    </div>
+
+    <div class="sb-section">
+      <div class="sb-section-label">Gestión</div>
+      <div class="nav-item" onclick="goPage('importacion',this)"><span class="nav-icon">↑</span> Importación</div>
+      <div class="nav-item" onclick="goPage('alertas',this)">
+        <span class="nav-icon">🔔</span> Alertas
+        <span class="nav-badge" id="alert-badge">3</span>
+      </div>
+      <div class="nav-item supervisor-only" onclick="goPage('roles',this)"><span class="nav-icon">🔐</span> Roles</div>
+    </div>
+
+    <div class="sb-bottom">
+      <div class="user-row">
+        <div class="user-av" id="sb-av">MB</div>
+        <div>
+          <div class="user-name" id="sb-name">M. Bisso</div>
+          <div class="user-role" id="sb-role">Supervisor</div>
+        </div>
+      </div>
+      <button class="logout-btn" onclick="doLogout()">← Cerrar sesión</button>
+    </div>
+  </nav>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-title" id="topbar-title">Dashboard</div>
+      <div class="topbar-tag" id="topbar-tag">RF01</div>
+      <div class="topbar-time" id="topbar-time">--:--</div>
+    </div>
+
+    <div class="content">
+
+      <!-- ── DASHBOARD ── -->
+      <div class="page active" id="page-dashboard">
+
+        <div class="kpi-grid">
+          <div class="kpi red">
+            <div class="kpi-icon-bg">🔴</div>
+            <div class="kpi-label">Críticos</div>
+            <div class="kpi-val c-red">3</div>
+            <div class="kpi-sub">Apertura inmediata</div>
+          </div>
+          <div class="kpi amber">
+            <div class="kpi-icon-bg">🟡</div>
+            <div class="kpi-label">Stock bajo</div>
+            <div class="kpi-val c-amber">5</div>
+            <div class="kpi-sub">Atención próxima</div>
+          </div>
+          <div class="kpi green">
+            <div class="kpi-icon-bg">🟢</div>
+            <div class="kpi-label">Stock OK</div>
+            <div class="kpi-val c-green">12</div>
+            <div class="kpi-sub">Sin acción requerida</div>
+          </div>
+          <div class="kpi blue">
+            <div class="kpi-icon-bg">📈</div>
+            <div class="kpi-label">Eficiencia</div>
+            <div class="kpi-val c-blue">94%</div>
+            <div class="kpi-sub">↑ 8% vs semana ant.</div>
+          </div>
+        </div>
+
+        <div class="sec-hdr">
+          <div class="sec-title">Semáforo de Stock</div>
+          <div class="sec-count" id="sem-count">12 piezas</div>
+          <div class="sec-actions">
+            <button class="btn btn-ghost btn-sm" onclick="refreshSem()">↻ Actualizar</button>
+          </div>
+        </div>
+        <div class="sem-grid" id="sem-grid"></div>
+
+        <div class="dash-cols">
+          <div>
+            <div class="sec-hdr"><div class="sec-title">Últimas aperturas</div><div class="sec-count">Hoy</div></div>
+            <div class="tbl-wrap">
+              <table>
+                <thead><tr><th>#</th><th>Contenedor</th><th>Pieza</th><th>Operario</th><th>Hora</th><th>Estado</th></tr></thead>
+                <tbody id="tbl-openings"></tbody>
+              </table>
+            </div>
+          </div>
+          <div>
+            <div class="sec-hdr"><div class="sec-title">Líneas de producción</div></div>
+            <div class="tbl-wrap">
+              <table>
+                <thead><tr><th>Línea</th><th>Cobertura</th><th>Estado</th></tr></thead>
+                <tbody>
+                  <tr><td>Línea A</td><td class="mono">4.2 hs</td><td><span class="badge amber">BAJA</span></td></tr>
+                  <tr><td>Línea B</td><td class="mono">1.1 hs</td><td><span class="badge red">CRÍTICA</span></td></tr>
+                  <tr><td>Línea C</td><td class="mono">8.0 hs</td><td><span class="badge green">OK</span></td></tr>
+                  <tr><td>Línea D</td><td class="mono">6.5 hs</td><td><span class="badge green">OK</span></td></tr>
+                  <tr><td>Línea E</td><td class="mono">2.8 hs</td><td><span class="badge amber">BAJA</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PLAN DE APERTURA ── -->
+      <div class="page" id="page-apertura">
+        <div class="sec-hdr">
+          <div class="sec-title">Plan de Apertura</div>
+          <div class="sec-count">8 contenedores</div>
+          <div class="sec-actions">
+            <button class="btn btn-ghost btn-sm">↓ Exportar</button>
+            <button class="btn btn-primary btn-sm" onclick="regenPlan()">⚡ Regenerar</button>
+          </div>
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr>
+              <th>Prior.</th><th>Contenedor</th><th>Pieza</th>
+              <th>Stock</th><th>Cobertura</th><th>Línea</th>
+              <th>Estado</th><th class="supervisor-only">Acción</th>
+            </tr></thead>
+            <tbody id="tbl-apertura"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── IMPORTACIÓN ── -->
+      <div class="page" id="page-importacion">
+        <div class="sec-hdr">
+          <div class="sec-title">Importación de Stock</div>
+          <div class="sec-actions">
+            <button class="btn btn-primary btn-sm" onclick="syncBoth()">⚡ Sincronizar ambas</button>
+          </div>
+        </div>
+
+        <div class="import-cols">
+          <!-- Fuente A -->
+          <div class="imp-panel">
+            <div class="imp-head">
+              <div class="imp-dot blue"></div>
+              <div class="imp-head-title">Stock de Planta</div>
+              <div class="imp-head-tag">Fuente A</div>
+            </div>
+            <div class="imp-body">
+              <div class="drop-zone" id="dz-a"
+                   onclick="pickFile('a')"
+                   ondragover="dzOver(event,'a')" ondragleave="dzLeave('a')" ondrop="dzDrop(event,'a')">
+                <div class="drop-icon">📊</div>
+                <div class="drop-title">Arrastrá o hacé click</div>
+                <div class="drop-sub">Excel / CSV — Software corporativo</div>
+                <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();pickFile('a')">Seleccionar</button>
+              </div>
+              <div class="file-pill" id="fp-a"></div>
+              <div class="imp-actions">
+                <button class="btn btn-primary btn-sm" onclick="runImport('a','stock_planta.xlsx',842)">Procesar</button>
+                <button class="btn btn-ghost btn-sm" onclick="clearZone('a')">Limpiar</button>
+              </div>
+              <div id="pp-a" style="display:none;margin-bottom:8px">
+                <div class="prog-label" id="pl-a">—</div>
+                <div class="prog-track"><div class="prog-fill blue" id="pb-a"></div></div>
+              </div>
+              <div class="imp-log" id="log-a"><div class="log-line">› Fuente A lista.</div></div>
+            </div>
+          </div>
+
+          <!-- Fuente B -->
+          <div class="imp-panel">
+            <div class="imp-head">
+              <div class="imp-dot amber"></div>
+              <div class="imp-head-title">Inventario Proveedor</div>
+              <div class="imp-head-tag">Fuente B</div>
+            </div>
+            <div class="imp-body">
+              <div class="drop-zone" id="dz-b"
+                   onclick="pickFile('b')"
+                   ondragover="dzOver(event,'b')" ondragleave="dzLeave('b')" ondrop="dzDrop(event,'b')">
+                <div class="drop-icon">🚚</div>
+                <div class="drop-title">Arrastrá o hacé click</div>
+                <div class="drop-sub">Excel / CSV — Manifiesto de contenedor</div>
+                <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();pickFile('b')">Seleccionar</button>
+              </div>
+              <div class="file-pill" id="fp-b"></div>
+              <div class="imp-actions">
+                <button class="btn btn-primary btn-sm" onclick="runImport('b','inventario_prov.csv',1240)">Procesar</button>
+                <button class="btn btn-ghost btn-sm" onclick="clearZone('b')">Limpiar</button>
+              </div>
+              <div id="pp-b" style="display:none;margin-bottom:8px">
+                <div class="prog-label" id="pl-b">—</div>
+                <div class="prog-track"><div class="prog-fill amber" id="pb-b"></div></div>
+              </div>
+              <div class="imp-log" id="log-b"><div class="log-line">› Fuente B lista.</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sec-hdr"><div class="sec-title">Historial</div></div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Fecha</th><th>Fuente</th><th>Archivo</th><th>Registros</th><th>Usuario</th><th>Estado</th></tr></thead>
+            <tbody id="imp-hist">
+              <tr><td class="mono">13/05 08:14</td><td><span class="badge blue">PLANTA</span></td><td>stock_planta_mayo.xlsx</td><td class="mono">842</td><td>M. Bisso</td><td><span class="badge green">OK</span></td></tr>
+              <tr><td class="mono">12/05 17:55</td><td><span class="badge amber">PROVEEDOR</span></td><td>inventario_proveedores.csv</td><td class="mono">1240</td><td>M. Bisso</td><td><span class="badge green">OK</span></td></tr>
+              <tr><td class="mono">12/05 09:02</td><td><span class="badge blue">PLANTA</span></td><td>export_sap_linea_b.xlsx</td><td class="mono">0</td><td>F. Serlik</td><td><span class="badge red">ERROR</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── ALERTAS ── -->
+      <div class="page" id="page-alertas">
+        <div class="sec-hdr">
+          <div class="sec-title">Alertas de Stock</div>
+          <div class="sec-count" id="alert-count">3 activas</div>
+          <div class="sec-actions">
+            <button class="btn btn-ghost btn-sm" onclick="ackAll()">✓ Reconocer todas</button>
+          </div>
+        </div>
+        <div class="alert-list" id="alert-list"></div>
+
+        <div style="margin-top:22px">
+          <div class="sec-hdr"><div class="sec-title">Historial</div></div>
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr><th>Fecha</th><th>Pieza</th><th>Nivel</th><th>Acción</th><th>Por</th></tr></thead>
+              <tbody>
+                <tr><td class="mono">12/05 14:32</td><td>SUSP-2091</td><td><span class="badge red">CRÍTICO</span></td><td>Apertura C-041</td><td>M. Bisso</td></tr>
+                <tr><td class="mono">11/05 09:17</td><td>MOT-1105</td><td><span class="badge amber">ADVERTENCIA</span></td><td>Reasignación línea C</td><td>R. Torino</td></tr>
+                <tr><td class="mono">10/05 16:44</td><td>TRANS-880</td><td><span class="badge red">CRÍTICO</span></td><td>Apertura C-028</td><td>M. Bisso</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── ROLES ── -->
+      <div class="page" id="page-roles">
+        <div class="sec-hdr">
+          <div class="sec-title">Roles y Permisos</div>
+          <div class="sec-actions">
+            <button class="btn btn-primary btn-sm" onclick="toast('Disponible en Sprint 2','info')">+ Usuario</button>
+          </div>
+        </div>
+
+        <div class="roles-cols">
+          <div class="role-card">
+            <div class="role-card-head">
+              <div class="role-av s">S</div>
+              <div>
+                <div class="role-card-name">Supervisor</div>
+                <div class="role-card-sub">Acceso completo</div>
+              </div>
+            </div>
+            <div class="perm-list">
+              <div class="perm-row"><span class="perm-icon on">✓</span> Ver dashboard de priorización</div>
+              <div class="perm-row"><span class="perm-icon on">✓</span> Crear y modificar plan de apertura</div>
+              <div class="perm-row"><span class="perm-icon on">✓</span> Importar datos (Fuente A y B)</div>
+              <div class="perm-row"><span class="perm-icon on">✓</span> Configurar umbrales de alerta</div>
+              <div class="perm-row"><span class="perm-icon on">✓</span> Gestionar usuarios y roles</div>
+            </div>
+          </div>
+          <div class="role-card">
+            <div class="role-card-head">
+              <div class="role-av o">O</div>
+              <div>
+                <div class="role-card-name">Operario</div>
+                <div class="role-card-sub">Solo ejecución</div>
+              </div>
+            </div>
+            <div class="perm-list">
+              <div class="perm-row"><span class="perm-icon on">✓</span> Ver semáforo de priorización</div>
+              <div class="perm-row"><span class="perm-icon on">✓</span> Ejecutar apertura de contenedor</div>
+              <div class="perm-row"><span class="perm-icon on">✓</span> Ver plan asignado</div>
+              <div class="perm-row"><span class="perm-icon off">✗</span> Importar o exportar datos</div>
+              <div class="perm-row"><span class="perm-icon off">✗</span> Gestionar usuarios o roles</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sec-hdr"><div class="sec-title">Usuarios</div><div class="sec-count">4 activos</div></div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th></th><th>Nombre</th><th>Email</th><th>Rol</th><th>Último acceso</th><th>Estado</th><th>Acción</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><div style="width:26px;height:26px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff">MB</div></td>
+                <td style="font-weight:600">Marcos Bisso</td><td class="mono">m.bisso@stellantis.com</td><td><span class="badge blue">Supervisor</span></td><td class="mono">13/05 08:02</td><td><span class="badge green">Activo</span></td><td><button class="btn btn-ghost btn-sm">Editar</button></td>
+              </tr>
+              <tr>
+                <td><div style="width:26px;height:26px;border-radius:50%;background:#7c3aed;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff">RT</div></td>
+                <td style="font-weight:600">R. Torino</td><td class="mono">r.torino@stellantis.com</td><td><span class="badge grey">Operario</span></td><td class="mono">13/05 07:48</td><td><span class="badge green">Activo</span></td><td><button class="btn btn-ghost btn-sm">Editar</button></td>
+              </tr>
+              <tr>
+                <td><div style="width:26px;height:26px;border-radius:50%;background:#7c3aed;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff">GF</div></td>
+                <td style="font-weight:600">G. Ferreyra</td><td class="mono">g.ferreyra@stellantis.com</td><td><span class="badge grey">Operario</span></td><td class="mono">12/05 16:20</td><td><span class="badge green">Activo</span></td><td><button class="btn btn-ghost btn-sm">Editar</button></td>
+              </tr>
+              <tr>
+                <td><div style="width:26px;height:26px;border-radius:50%;background:#9ca3af;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff">JM</div></td>
+                <td style="font-weight:600">J. Méndez</td><td class="mono">j.mendez@stellantis.com</td><td><span class="badge grey">Operario</span></td><td class="mono">08/05 11:05</td><td><span class="badge amber">Inactivo</span></td><td><button class="btn btn-ghost btn-sm">Editar</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<div class="toast-area" id="toast-area"></div>
+
+<script>
+/* ── state ── */
+let role = 'supervisor';
+let fileA = null, fileB = null;
+let runA = false, runB = false;
+
+/* ── data ── */
+const semData = [
+  {id:'C-014',name:'SUSP-2091', piece:'Suspensión Delantera', stock:4,  max:80,st:'red'},
+  {id:'C-007',name:'MOT-1105',  piece:'Conjunto Motor',        stock:8,  max:80,st:'red'},
+  {id:'C-022',name:'TRANS-880', piece:'Transmisión',           stock:11, max:80,st:'red'},
+  {id:'C-031',name:'FRENO-410', piece:'Sistema de Frenos',     stock:22, max:80,st:'amber'},
+  {id:'C-018',name:'DIR-220',   piece:'Dirección Asistida',    stock:28, max:80,st:'amber'},
+  {id:'C-009',name:'ELEC-550',  piece:'Módulo Eléctrico',      stock:31, max:80,st:'amber'},
+  {id:'C-055',name:'AIRBAG-60', piece:'Módulo Airbag',         stock:60, max:80,st:'green'},
+  {id:'C-060',name:'TAPA-330',  piece:'Capó',                  stock:72, max:80,st:'green'},
+  {id:'C-071',name:'INT-445',   piece:'Tablero Interior',      stock:65, max:80,st:'green'},
+];
+const openData = [
+  {id:'C-041',piece:'SUSP-2091',op:'R. Torino',   time:'07:42',st:'green'},
+  {id:'C-035',piece:'MOT-0890', op:'G. Ferreyra', time:'07:58',st:'green'},
+  {id:'C-012',piece:'ELEC-221', op:'R. Torino',   time:'08:14',st:'amber'},
+  {id:'C-028',piece:'TRANS-780',op:'G. Ferreyra', time:'08:31',st:'green'},
+  {id:'C-019',piece:'FRENO-308',op:'R. Torino',   time:'08:47',st:'red'},
+];
+const aperData = [
+  {p:1,id:'C-014',piece:'SUSP-2091', stock:4,  cob:'1.1 hs',linea:'B',st:'red'},
+  {p:2,id:'C-007',piece:'MOT-1105',  stock:8,  cob:'1.8 hs',linea:'B',st:'red'},
+  {p:3,id:'C-022',piece:'TRANS-880', stock:11, cob:'2.2 hs',linea:'A',st:'red'},
+  {p:4,id:'C-031',piece:'FRENO-410', stock:22, cob:'4.1 hs',linea:'A',st:'amber'},
+  {p:5,id:'C-018',piece:'DIR-220',   stock:28, cob:'5.0 hs',linea:'E',st:'amber'},
+  {p:6,id:'C-009',piece:'ELEC-550',  stock:31, cob:'5.5 hs',linea:'C',st:'amber'},
+  {p:7,id:'C-044',piece:'CHASIS-100',stock:45, cob:'7.2 hs',linea:'D',st:'amber'},
+  {p:8,id:'C-055',piece:'AIRBAG-60', stock:60, cob:'9.0 hs',linea:'C',st:'green'},
+];
+const alertData = [
+  {id:1,type:'crit',dot:'red',  title:'Stock crítico — SUSP-2091',desc:'4 u · Cobertura 1.1 hs · Línea B en riesgo inmediato',time:'08:52',acked:false},
+  {id:2,type:'crit',dot:'red',  title:'Stock crítico — MOT-1105', desc:'8 u · Cobertura 1.8 hs · Línea B próxima a detenerse',time:'08:48',acked:false},
+  {id:3,type:'warn',dot:'amber',title:'Stock bajo — FRENO-410',   desc:'22 u · Cobertura 4.1 hs · Atención en próximas 2 hs', time:'08:30',acked:false},
+];
+
+/* ── login ── */
+function pickRole(r, el) {
+  role = r;
+  document.querySelectorAll('.role-opt').forEach(x=>x.classList.remove('active'));
+  el.classList.add('active');
+}
+function doLogin() {
+  const user = document.getElementById('login-user').value.trim() || 'M. Bisso';
+  document.getElementById('sb-name').textContent = user.slice(0,14);
+  document.getElementById('sb-role').textContent = role==='supervisor'?'Supervisor':'Operario';
+  const ini = user.split(/[\s.]+/).map(w=>w[0]).filter(Boolean).join('').slice(0,2).toUpperCase()||'MB';
+  document.getElementById('sb-av').textContent = ini;
+  document.querySelectorAll('.supervisor-only').forEach(el=>el.style.display=role==='supervisor'?'':'none');
+  document.getElementById('login-screen').classList.remove('active');
+  document.getElementById('app-screen').classList.add('active');
+  buildSem(); buildAper(); buildAlerts(); buildOpenings(); startClock();
+  toast('Sesión iniciada — '+(role==='supervisor'?'Supervisor':'Operario'),'ok');
+}
+function doLogout(){
+  document.getElementById('app-screen').classList.remove('active');
+  document.getElementById('login-screen').classList.add('active');
+}
+
+/* ── nav ── */
+const titles = {
+  dashboard:   ['Dashboard','RF01'],
+  apertura:    ['Plan de Apertura','RF04'],
+  importacion: ['Importación de Stock','RF03'],
+  alertas:     ['Alertas de Stock','RF05'],
+  roles:       ['Roles y Permisos','RF02'],
+};
+function goPage(p, el) {
+  if(p==='roles'&&role!=='supervisor'){toast('Acceso denegado','err');return;}
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.page').forEach(pg=>pg.classList.remove('active'));
+  document.getElementById('page-'+p).classList.add('active');
+  const[t,tag]=titles[p]||['',''];
+  document.getElementById('topbar-title').textContent=t;
+  document.getElementById('topbar-tag').textContent=tag;
+}
+
+/* ── semaphore ── */
+function buildSem() {
+  const pct = d=>Math.round((d.stock/d.max)*100);
+  document.getElementById('sem-grid').innerHTML = semData.map(d=>`
+    <div class="sem-card">
+      <div class="sem-dot ${d.st}"></div>
+      <div class="sem-body">
+        <div class="sem-piece">${d.piece}</div>
+        <div class="sem-name">${d.name} · <span style="color:var(--faint);font-size:11px;font-family:var(--mono)">${d.id}</span></div>
+        <div class="sem-track"><div class="sem-fill ${d.st}" style="width:${pct(d)}%"></div></div>
+      </div>
+      <div class="sem-num ${d.st}">${d.stock}</div>
+    </div>`).join('');
+}
+function refreshSem(){
+  semData.forEach(d=>{
+    if(d.st==='red')   d.stock=Math.max(2,d.stock+Math.floor(Math.random()*4-1));
+    if(d.st==='amber') d.stock=Math.max(15,d.stock+Math.floor(Math.random()*6-2));
+    if(d.st==='green') d.stock=Math.max(40,d.stock+Math.floor(Math.random()*8-3));
+  });
+  buildSem(); toast('Semáforo actualizado','ok');
+}
+
+/* ── apertura ── */
+function buildAper(){
+  const sup=role==='supervisor';
+  const label={red:'Crítico',amber:'Atención',green:'OK'};
+  document.getElementById('tbl-apertura').innerHTML=aperData.map(d=>`
+    <tr>
+      <td><div class="prio p${d.p<=3?1:d.p<=7?2:3}">${d.p}</div></td>
+      <td class="mono">${d.id}</td>
+      <td style="font-weight:600">${d.piece}</td>
+      <td class="mono">${d.stock} u.</td>
+      <td class="mono">${d.cob}</td>
+      <td><span class="badge blue">Línea ${d.linea}</span></td>
+      <td><span class="badge ${d.st}">${label[d.st]}</span></td>
+      ${sup?`<td><button class="btn btn-ghost btn-sm" onclick="toast('Asignado: ${d.id}','ok')">Asignar</button></td>`
+           :`<td><button class="btn btn-primary btn-sm" onclick="toast('Apertura: ${d.id}','ok')">Abrir</button></td>`}
+    </tr>`).join('');
+}
+function regenPlan(){
+  aperData.sort(()=>Math.random()-.5);
+  aperData.forEach((d,i)=>d.p=i+1);
+  buildAper(); toast('Plan regenerado','ok');
+}
+
+/* ── openings ── */
+function buildOpenings(){
+  const label={green:'OK',amber:'Atención',red:'Revisión'};
+  document.getElementById('tbl-openings').innerHTML=openData.map((d,i)=>`
+    <tr>
+      <td class="mono">${i+1}</td>
+      <td class="mono">${d.id}</td>
+      <td style="font-weight:600">${d.piece}</td>
+      <td>${d.op}</td>
+      <td class="mono">${d.time}</td>
+      <td><span class="badge ${d.st}">${label[d.st]}</span></td>
+    </tr>`).join('');
+}
+
+/* ── alerts ── */
+function buildAlerts(){
+  const active=alertData.filter(a=>!a.acked);
+  document.getElementById('alert-badge').textContent=active.length;
+  document.getElementById('alert-count').textContent=active.length+' activas';
+  document.getElementById('alert-list').innerHTML=active.length
+    ? active.map(a=>`
+      <div class="alert-row ${a.type}">
+        <div class="alert-dot ${a.dot}"></div>
+        <div class="alert-body">
+          <div class="alert-title">${a.title}</div>
+          <div class="alert-desc">${a.desc}</div>
+        </div>
+        <div class="alert-time">${a.time}</div>
+        <button class="ack-btn" onclick="ackOne(${a.id})">✓ Reconocer</button>
+      </div>`).join('')
+    : '<div style="padding:20px 0;color:var(--muted);font-size:13px">✓ Sin alertas activas en este momento.</div>';
+}
+function ackOne(id){ const a=alertData.find(x=>x.id===id); if(a){a.acked=true;buildAlerts();toast('Alerta reconocida','ok');} }
+function ackAll(){ alertData.forEach(a=>a.acked=true); buildAlerts(); toast('Todas reconocidas','ok'); }
+
+/* ── import ── */
+const mockA=['stock_planta_mayo.xlsx','inventario_linea_b.xlsx','export_sap.csv'];
+const mockB=['manifiesto_autoparts.xlsx','inventario_proveedor.csv','stock_origen.xlsx'];
+
+function pickFile(z){
+  const name=(z==='a'?mockA:mockB)[Math.floor(Math.random()*3)];
+  setFile(z,name);
+  toast('Archivo: '+name,'info');
+}
+function setFile(z,name){
+  const fp=document.getElementById('fp-'+z);
+  fp.textContent='📄 '+name; fp.style.display='block';
+  if(z==='a') fileA=name; else fileB=name;
+}
+function clearZone(z){
+  document.getElementById('fp-'+z).style.display='none';
+  document.getElementById('pp-'+z).style.display='none';
+  document.getElementById('pb-'+z).style.width='0%';
+  document.getElementById('log-'+z).innerHTML=`<div class="log-line">› Zona ${z.toUpperCase()} limpiada.</div>`;
+  if(z==='a'){fileA=null;runA=false;}else{fileB=null;runB=false;}
+}
+function runImport(z,def,recs){
+  if(z==='a'&&runA){toast('Ya en curso (Fuente A)','err');return;}
+  if(z==='b'&&runB){toast('Ya en curso (Fuente B)','err');return;}
+  const fname=(z==='a'?fileA:fileB)||def;
+  if(z==='a') runA=true; else runB=true;
+  const pp=document.getElementById('pp-'+z);
+  const pb=document.getElementById('pb-'+z);
+  const pl=document.getElementById('pl-'+z);
+  const log=document.getElementById('log-'+z);
+  pp.style.display='block'; pb.style.width='0%'; log.innerHTML='';
+  const src=z==='a'?'Stock de Planta':'Inventario Proveedor';
+  const steps=[
+    [0,'info','› Conectando con '+src+'…'],
+    [18,'ok','› Leyendo '+fname+'…'],
+    [35,'ok','› Validando esquema…'],
+    [52,'ok','› Procesando '+recs+' registros…'],
+    [70,'ok','› Cruzando con stock de línea…'],
+    [85,'ok','› Actualizando semáforo…'],
+    [100,'ok','✓ '+recs+' registros completados'],
+  ];
+  let i=0;
+  const next=()=>{
+    if(i>=steps.length){
+      if(z==='a') runA=false; else runB=false;
+      pl.textContent='Completado ✓';
+      buildSem();
+      addHist(z,fname,recs);
+      toast('[Fuente '+z.toUpperCase()+'] '+recs+' registros importados','ok');
+      return;
     }
+    const[pct,cls,msg]=steps[i];
+    pb.style.width=pct+'%';
+    pl.textContent=fname+' — '+pct+'%';
+    const line=document.createElement('div');
+    line.className='log-line '+cls;
+    line.textContent=msg;
+    log.appendChild(line);
+    log.scrollTop=log.scrollHeight;
+    i++;
+    setTimeout(next,360+Math.random()*160);
+  };
+  next();
+}
+function syncBoth(){
+  runImport('a','stock_planta.xlsx',842);
+  setTimeout(()=>runImport('b','prov_sync.csv',1240),600);
+}
+function addHist(z,fname,recs){
+  const t=document.getElementById('imp-hist');
+  const now=new Date();
+  const ts=`${now.getDate().toString().padStart(2,'0')}/${(now.getMonth()+1).toString().padStart(2,'0')} ${now.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'})}`;
+  const b=z==='a'?'<span class="badge blue">PLANTA</span>':'<span class="badge amber">PROVEEDOR</span>';
+  const r=document.createElement('tr');
+  r.innerHTML=`<td class="mono">${ts}</td><td>${b}</td><td>${fname}</td><td class="mono">${recs}</td><td>${document.getElementById('sb-name').textContent}</td><td><span class="badge green">OK</span></td>`;
+  t.insertBefore(r,t.firstChild);
+}
+function dzOver(e,z){e.preventDefault();document.getElementById('dz-'+z).classList.add('over');}
+function dzLeave(z){document.getElementById('dz-'+z).classList.remove('over');}
+function dzDrop(e,z){
+  e.preventDefault();document.getElementById('dz-'+z).classList.remove('over');
+  const f=e.dataTransfer.files[0];
+  if(f){setFile(z,f.name);toast('Archivo cargado: '+f.name,'info');}
+}
+
+/* ── clock ── */
+function startClock(){
+  const el=document.getElementById('topbar-time');
+  const t=()=>{el.textContent=new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});setTimeout(t,1000);};
+  t();
+}
+
+/* ── toast ── */
+function toast(msg,type='info'){
+  const area=document.getElementById('toast-area');
+  const el=document.createElement('div');
+  el.className=`toast ${type}`;
+  el.innerHTML=`<span style="font-size:13px">${{ok:'✓',err:'✕',info:'i'}[type]}</span> ${msg}`;
+  area.appendChild(el);
+  setTimeout(()=>{el.style.opacity='0';el.style.transition='opacity .25s';setTimeout(()=>el.remove(),250);},3000);
+}
 </script>
 </body>
 </html>
