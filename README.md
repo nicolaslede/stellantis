@@ -19,6 +19,8 @@ Las dependencias necesarias para la interfaz web (Flask) y el manejo de datos (P
 
 
  HAADOP/BIN/ WINUTILS/HAADOP
+ amazon-corretto-11.0.31.11.1-windows-x64.msi  (INSTALAR)
+ SPARK.ZIP
  
 
 ```bash
